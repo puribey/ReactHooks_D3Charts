@@ -2,6 +2,8 @@
 
 ### Circles
 
+`const [data, setData] = useState([25, 35, 40, 10, 39, 70, 90]`
+
 ```
     const svg = select(svgRef.current);
     svg
@@ -24,10 +26,12 @@
 
 ### Line and Path
 
+`const [data, setData] = useState([25, 35, 40, 10, 39, 70, 90]`
+
 ```
     const svg = select(svgRef.current);
     // line() needs to receive an array of coordinates
-    const myLine = line<any>()
+    const myLine = line<number>()
       .x((value, index) => index * 50)
       .y(value => 150 - value).curve(curveCardinal)
     svg
@@ -35,6 +39,36 @@
       .data([data])
       .join("path")
       .attr("d", value => myLine(value))
+      .attr("fill", "none")
+      .attr("stroke", "black");
+```
+
+### Scales
+
+```
+    const svg = select(svgRef.current);
+
+    // xScale which accepts input value between 0 and 6 (the domain) and maps it to output between 0 and 300 (the range)
+    // domain() refers to the actual info you get and range() the space you have for the render
+    const xScale = scaleLinear()
+      .domain([0, data.length - 1])
+      .range([0, 300]);
+    const yScale = scaleLinear()
+      .domain([0, 150])
+      .range([150, 0]);
+
+    // line() needs to receive an array of coordinates
+    // generates the d attr inside a path element
+    const myLine = line<number>()
+      .x((_value, index) => xScale(index))
+      .y(yScale)
+      .curve(curveCardinal);
+    svg
+      .selectAll(".line")
+      .data([data])
+      .join("path")
+      .attr("class", "line")
+      .attr("d", myLine)
       .attr("fill", "none")
       .attr("stroke", "black");
 ```

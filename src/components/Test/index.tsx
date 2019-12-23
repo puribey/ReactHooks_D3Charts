@@ -1,9 +1,9 @@
 import React, { useRef, useEffect, useState } from "react";
 import "./test.css";
-import { select, line, curveCardinal } from "d3";
+import { select, line, curveCardinal, scaleLinear } from "d3";
 
 const Test: React.FC = () => {
-  const [data, setData] = useState([25, 35, 40, 10, 39, 70, 90]);
+  const [data, setData] = useState([25, 30, 45, 60, 20, 65, 75]);
   // useRef --> https://reactjs.org/docs/hooks-reference.html#useref
   const svgRef = useRef(null);
 
@@ -11,22 +11,37 @@ const Test: React.FC = () => {
   // Called once when the element renders
   useEffect(() => {
     const svg = select(svgRef.current);
+
+    // xScale which accepts input value between 0 and 6 (the domain) and maps it to output between 0 and 300 (the range)
+    // domain() refers to the actual info you get and range() the space you have for the render
+    const xScale = scaleLinear()
+      .domain([0, data.length - 1])
+      .range([0, 300]);
+    const yScale = scaleLinear()
+      .domain([0, 150])
+      .range([150, 0]);
+
     // line() needs to receive an array of coordinates
-    const myLine = line<any>()
-      .x((_value, index) => index * 50)
-      .y(value => 150 - value).curve(curveCardinal)
+    // generates the d attr inside a path element 
+    const myLine = line<number>()
+      .x((_value, index) => xScale(index))
+      .y(yScale)
+      .curve(curveCardinal);
     svg
-      .selectAll("path")
+      .selectAll(".line")
       .data([data])
       .join("path")
-      .attr("d", value => myLine(value))
+      .attr("class", "line")
+      .attr("d", myLine)
       .attr("fill", "none")
       .attr("stroke", "black");
   }, [data]);
 
   return (
     <>
-      <svg ref={svgRef}></svg>
+      <svg ref={svgRef}>
+        <g className="x-axis" />
+      </svg>
       <button onClick={() => setData(data.map(value => value + 5))}>
         Update data
       </button>
