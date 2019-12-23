@@ -1,4 +1,43 @@
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+# React Hooks + D3js
+
+### Circles
+
+```
+    const svg = select(svgRef.current);
+    svg
+      .selectAll("circle")
+      .data(data)
+      .join(
+        // elements to create
+        enter =>
+          enter
+            .append("circle")
+            .attr("class", "new")
+            .attr("stroke", "red"),
+        // elements to update
+        update => update.attr("class", "update")
+      )
+      .attr("r", value => value)
+      .attr("cx", value => value * 2)
+      .attr("cy", value => value * 2);
+```
+
+### Line and Path
+
+```
+    const svg = select(svgRef.current);
+    // line() needs to receive an array of coordinates
+    const myLine = line<any>()
+      .x((value, index) => index * 50)
+      .y(value => 150 - value).curve(curveCardinal)
+    svg
+      .selectAll("path")
+      .data([data])
+      .join("path")
+      .attr("d", value => myLine(value))
+      .attr("fill", "none")
+      .attr("stroke", "black");
+```
 
 ## Available Scripts
 

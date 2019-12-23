@@ -1,9 +1,9 @@
 import React, { useRef, useEffect, useState } from "react";
 import "./test.css";
-import { select } from "d3";
+import { select, line, curveCardinal } from "d3";
 
 const Test: React.FC = () => {
-  const [data, setData] = useState([25, 35, 45, 55, 65]);
+  const [data, setData] = useState([25, 35, 40, 10, 39, 70, 90]);
   // useRef --> https://reactjs.org/docs/hooks-reference.html#useref
   const svgRef = useRef(null);
 
@@ -11,22 +11,17 @@ const Test: React.FC = () => {
   // Called once when the element renders
   useEffect(() => {
     const svg = select(svgRef.current);
+    // line() needs to receive an array of coordinates
+    const myLine = line<any>()
+      .x((_value, index) => index * 50)
+      .y(value => 150 - value).curve(curveCardinal)
     svg
-      .selectAll("circle")
-      .data(data)
-      .join(
-        // elements to create
-        enter =>
-          enter
-            .append("circle")
-            .attr("class", "new")
-            .attr("stroke", "red"),
-        // elements to update
-        update => update.attr("class", "update")
-      )
-      .attr("r", value => value)
-      .attr("cx", value => value * 2)
-      .attr("cy", value => value * 2);
+      .selectAll("path")
+      .data([data])
+      .join("path")
+      .attr("d", value => myLine(value))
+      .attr("fill", "none")
+      .attr("stroke", "black");
   }, [data]);
 
   return (
